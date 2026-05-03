@@ -324,7 +324,11 @@ def search_ytdlp(query, limit=6):
             '--no-playlist', '--flat-playlist',
             f'ytsearch{limit}:{query}'
         ]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+        if result.returncode != 0:
+            print(f"[yt-dlp] CLI Error: {result.stderr}")
+            return []
+
         tracks = []
         for line in result.stdout.strip().split('\n'):
             if line.startswith('{'):
@@ -359,6 +363,8 @@ def stream_ytdlp(video_id):
             f'https://www.youtube.com/watch?v={video_id}'
         ]
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        if result.returncode != 0:
+            print(f"[yt-dlp] CLI Error: {result.stderr}")
         for line in result.stdout.strip().split('\n'):
             if line.startswith('http'):
                 print(f'[yt-dlp] Stream OK')
